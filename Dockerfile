@@ -1,5 +1,4 @@
-FROM alpine:3.13
-
+FROM golang:1.15-alpine
 RUN apk add --no-cache curl bash tar gzip
 
 ARG TKN_VERSION="0.17.0"
