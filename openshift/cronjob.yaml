@@ -1,0 +1,58 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cleaner
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cleaner
+rules:
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns"]
+    verbs: ["delete", "get", "watch", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cleaner-to-cleaner
+roleRef:
+  kind: Role
+  name: cleaner
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: cleaner
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cleanup-pipelineruns
+spec:
+  schedule: "1 4 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccount: cleaner
+          containers:
+            - name: cleaner
+              image: docker.io/scaps/ocp-k8s-tkn-basic-tools:latest
+              env:
+                - name: NAMESPACE
+                  value: "my-tekton-build-project"
+              command:
+                - /bin/bash
+                - |
+                    export PATH=$PATH:/usr/local/bin
+                    TOKEN=$( cat /run/secrets/kubernetes.io/serviceaccount/token )
+                     
+                    /usr/local/bin/oc login --token=$TOKEN https://kubernetes.default.svc
+                    /usr/local/bin/oc project $NAMESPACE
+
+                    for pod in $(/usr/local/bin/tkn pipelinerun list | awk '/[2-9] days ago.*(Cancelled|Succeeded|Failed)/ { print $1 }'); do
+                        /usr/local/bin/tkn pipelinerun delete ${pod} --force > /dev/null
+                    done
