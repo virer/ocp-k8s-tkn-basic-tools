@@ -1,0 +1,16 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: ocp-k8s-tkn-basic-tools
+  namespace: pipe
+spec:
+  source:
+    git:
+      ref: main
+      uri: 'git@github.com:virer/ocp-k8s-tkn-basic-tools.git'
+    type: Git
+  strategy:
+    type: docker
+    dockerStrategy: {}
+  triggers:
+    - type: ConfigChange
