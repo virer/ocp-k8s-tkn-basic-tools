@@ -1,0 +1,17 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tkn-cleaner-script
+data:
+  tkn-cleaner-script.sh: >
+    export PATH=$PATH:/usr/local/bin 
+
+    TOKEN=$( cat /run/secrets/kubernetes.io/serviceaccount/token ) 
+
+    oc login --token=$TOKEN https://kubernetes.default.svc 
+    oc project $NAMESPACE
+
+    for pod in $(/usr/local/bin/tkn pipelinerun list | awk '/[2-9] days ago.*(Cancelled|Succeeded|Failed)/ { print $1 }'); do
+      tkn pipelinerun delete ${pod} --force
+    done
