@@ -1,6 +1,6 @@
 FROM alpine:3.13
 
-RUN apk add --no-cache curl bash
+RUN apk add --no-cache curl bash tar
 
 ARG TKN_VERSIOn="0.17.0"
 ARG OCP_VERSION="4.6.22"
