@@ -5,6 +5,7 @@ metadata:
   name: tkn-cleaner-script
 data:
   tkn-cleaner-script.sh: >
+    #!/bin/bash
     export PATH=$PATH:/usr/local/bin 
 
     TOKEN=$( cat /run/secrets/kubernetes.io/serviceaccount/token ) 
