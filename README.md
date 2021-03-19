@@ -13,7 +13,7 @@ TOKEN=$( cat /run/secrets/kubernetes.io/serviceaccount/token )
 /usr/local/bin/oc project $NAMESPACE
 
 for pod in $(/usr/local/bin/tkn pipelinerun list | awk '/[2-9] days ago.*(Cancelled|Succeeded|Failed)/ { print $1 }'); do
-  /usr/local/bin/tkn pipelinerun delete ${pod} --force > /dev/null
+  /usr/local/bin/tkn pipelinerun delete ${pod} --force
 done
 # EOF
 <pre>
