@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
     tar \
     && rm -rf /var/lib/apt/lists/*
 
-ARG TKN_VERSION="0.17.0"
-ARG OCP_VERSION="4.6.16"
+ARG TKN_VERSION="0.20.0"
+ARG OCP_VERSION="4.7.30"
 # ARG K8S_VERSION="1.19.1"
 
 RUN curl -LO "https://github.com/tektoncd/cli/releases/download/v${TKN_VERSION}/tkn_${TKN_VERSION}_Linux_x86_64.tar.gz"
